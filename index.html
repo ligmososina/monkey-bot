@@ -208,6 +208,58 @@
             0% { transform: translateY(0) scale(1); opacity: 1; }
             100% { transform: translateY(-100px) scale(1.4); opacity: 0; }
         }
+        /* Стилі для нижньої панелі */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #150824; /* Трохи темніший фон для контрасту */
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 24px 0; /* Нижній відступ для зручності на айфонах */
+            z-index: 2000;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #666;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 25%;
+            transition: all 0.2s;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            transition: transform 0.2s;
+        }
+
+        /* Активна (натиснута) кнопка стає жовтою і підстрибує */
+        .nav-btn.active { color: #ffe066; }
+        .nav-btn.active .nav-icon { transform: translateY(-4px) scale(1.1); }
+        
+        /* Базові стилі для нових екранів */
+        .game-tab {
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            padding: 0px 16px 90px; /* 90px знизу, щоб контент не ховався за панеллю */
+            overflow-y: auto;
+            gap: 20px;
+        }
+
+        /* Додаємо такий самий відступ для старих екранів */
+        #screen, #shop-screen {
+            padding-bottom: 90px !important; 
+        }
     </style>
 </head>
 <body>
@@ -223,7 +275,7 @@
         <div class="tap-hint">тицяй на мавпу!</div>
     </div>
 
-    <button class="btn-shop" onclick="openShop()">🛒 Магазин</button>
+    
 </div>
 
 <div id="shop-screen">
@@ -231,7 +283,7 @@
     <div class="sticky-top">
         <div class="shop-header">
             <span class="shop-title">🛒 Магазин</span>
-            <button class="btn-close" onclick="closeShop()">✖ Назад</button>
+            
         </div>
 
         <div class="shop-balance" id="shop-balance">🍌 0.0 бененів</div>
@@ -281,6 +333,38 @@
     
     <div id="msg-shop"></div>
 </div>
+<div id="secret-screen" class="game-tab" style="display: none;">
+        <div class="sticky-top">
+            <div class="shop-header"><span class="shop-title">🤫 Чорний ринок</span></div>
+        </div>
+        <div style="text-align:center; color:#888; margin-top:50px;">Тут продаватимуться унікальні секретні речі...</div>
+    </div>
+
+    <div id="achievements-screen" class="game-tab" style="display: none;">
+        <div class="sticky-top">
+            <div class="shop-header"><span class="shop-title">🏆 Досягнення</span></div>
+        </div>
+        <div style="text-align:center; color:#888; margin-top:50px;">Виконуй завдання та отримуй нагороди!</div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="switchTab('screen', this)">
+            <span class="nav-icon">👆</span>
+            <span>Клік</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('shop-screen', this)">
+            <span class="nav-icon">🛒</span>
+            <span>Магазин</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('secret-screen', this)">
+            <span class="nav-icon">🤫</span>
+            <span>Секрети</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('achievements-screen', this)">
+            <span class="nav-icon">🏆</span>
+            <span>ДосягненняГаттоуза</span>
+        </button>
+    </nav>
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
@@ -435,17 +519,25 @@
         setTimeout(() => el.textContent = '', 2000);
     }
 
-    function openShop() {
+   // Функція перемикання вкладок
+    function switchTab(tabId, btnElement) {
+        // 1. Ховаємо абсолютно всі екрани
         document.getElementById('screen').style.display = 'none';
-        document.getElementById('shop-screen').style.display = 'flex';
+        document.getElementById('shop-screen').style.display = 'none';
+        document.getElementById('secret-screen').style.display = 'none';
+        document.getElementById('achievements-screen').style.display = 'none';
+
+        // 2. Показуємо лише той екран, який нам потрібен
+        document.getElementById(tabId).style.display = 'flex';
+
+        // 3. Знімаємо підсвітку з усіх кнопок знизу
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+        // 4. Підсвічуємо ту кнопку, на яку щойно натиснули
+        btnElement.classList.add('active');
+
         updateUI();
     }
-
-    function closeShop() {
-        document.getElementById('shop-screen').style.display = 'none';
-        document.getElementById('screen').style.display = 'flex';
-    }
-
     function updateUI() {
         const b = Math.floor(beneny * 10) / 10;
         document.getElementById('beneny').textContent = `🍌 ${b.toFixed(1)} бененів`;
@@ -479,6 +571,7 @@
         lastUpdate = now;
         updateUI();
     }, 100);
+
 </script>
 </body>
 </html>
