@@ -34,7 +34,7 @@ def get_player(db, user_id):
             "ryja_mavpy": 0,
             "narkotyczna_mavpy": 0,
             "gattouz_bradar": 0,
-            "mavpa_tap": 1
+            "mavpa_tap": 1,
             "last_update": asyncio.get_event_loop().time()
         }
     return db[uid]

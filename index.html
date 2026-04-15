@@ -250,7 +250,18 @@
                 <div class="owned-badge" id="gattouz-owned">У тебе: 0 шт.</div>
         </div> <button class="btn-buy" onclick="buyGattouz()">Купити</button>
     </div>
-
+    
+    <div class="item-card">
+        <div class="item-icon">⚡</div>
+        <div class="item-info">
+            <div class="item-name">золотий банан</div>
+            <div class="item-desc">Збільшує дохід за один клік</div>
+            <div id="tap-price">Ціна: 100000 бененів</div>
+            <div class="owned-badge" id="tap-level">Поточна сила: 1</div>
+        </div>
+        <button class="btn-buy" onclick="buyTap()">Покращити</button>
+    </div>
+    
     <div id="msg-shop"></div>
 </div>
 <script>
@@ -349,6 +360,19 @@
         updateUI();
     }
 
+    function buyTap() {
+        const price = 100000 * mavpa_tap; // З кожним рівнем ціна росте
+        if (beneny >= price) {
+            beneny -= price;
+            mavpa_tap += 1;
+            showMsg('⚡ Дохід збільшено!');
+            saveState();
+        } else {
+            showMsg(`❌ Треба ${price} бененів!`);
+        }
+        updateUI();
+    }
+    
     function showMsg(text) {
         const el = document.getElementById('msg-shop');
         el.textContent = text;
@@ -373,7 +397,10 @@
         const price = 10 + ryja_mavpy * 10;
         const narkoPrice = 50 + narkotyczna_mavpy * 50;
         const gattouzPrice = 5242 + gattouz_bradar * 5242;
-
+        const tapPrice = 100000 * mavpa_tap;
+        
+        document.getElementById('tap-price').textContent = `Ціна: ${tapPrice} бененів`;
+        document.getElementById('tap-level').textContent = `Поточний дохід: ${mavpa_tap}`;
         document.getElementById('trump-price').textContent = `Ціна: ${price} бененів`;
         document.getElementById('narko-price').textContent = `Ціна: ${narkoPrice} бененів`;
         document.getElementById('gattouz-price').textContent = `Ціна: ${gattouzPrice} бененів`;
@@ -399,4 +426,4 @@
 </script>
 </body>
 </html>
-/*чорні
+
