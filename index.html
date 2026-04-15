@@ -406,7 +406,7 @@
         const price = 100000 * mavpa_tap; // З кожним рівнем ціна росте
         if (beneny >= price) {
             beneny -= price;
-            mavpa_tap += 1;
+            mavpa_tap += 5;
             showMsg('⚡ Дохід збільшено!');
             saveState();
         } else {
