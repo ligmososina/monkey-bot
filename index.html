@@ -191,6 +191,23 @@
             color: #a0e0a0;
             margin-top: 4px;
         }
+    /* Стиль для цифр, що вилітають */
+        .floating-text {
+            position: absolute;
+            font-size: 28px;
+            font-weight: 900;
+            color: #ffe066; /* Колір твоїх бененів */
+            pointer-events: none; /* Дуже важливо: щоб цифри не блокували наступні кліки */
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5); /* Легка тінь для об'єму */
+            animation: floatUp 0.8s ease-out forwards;
+            z-index: 1000;
+        }
+
+        /* Сама анімація (політ вгору і зникнення) */
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.4); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -317,10 +334,35 @@
         }, 1000);
     }
 
-    document.getElementById('tap-btn').addEventListener('click', () => {
-        beneny +=  mavpa_tap;;
+   // Нова функція для створення літаючих цифр
+    function spawnFloatingText(e) {
+        // Створюємо новий HTML-елемент "на льоту"
+        const floatEl = document.createElement('div');
+        floatEl.classList.add('floating-text');
+        floatEl.textContent = `+${mavpa_tap}`; // Показує поточну силу тапа
+        
+        // Додаємо трохи рандому (від -20 до +20 пікселів), щоб при швидких кліках цифри не зливалися в одну лінію
+        const randomX = (Math.random() - 0.5) * 40; 
+        
+        // e.clientX та e.clientY — це точні координати твого дотику до екрана
+        floatEl.style.left = `${e.clientX - 10 + randomX}px`;
+        floatEl.style.top = `${e.clientY - 20}px`;
+
+        // Додаємо цифру на екран
+        document.body.appendChild(floatEl);
+
+        // Видаляємо цифру з пам'яті через 800 мілісекунд (коли закінчиться анімація польоту)
+        setTimeout(() => {
+            floatEl.remove();
+        }, 800);
+    }
+
+    // Оновлений клік по мавпі
+    document.getElementById('tap-btn').addEventListener('click', (e) => {
+        beneny += mavpa_tap;
         updateUI();
         saveState();
+        spawnFloatingText(e); // Запускаємо нашу нову анімацію і передаємо їй координати (літеру "e")
     });
 
     function buyTrump() {
