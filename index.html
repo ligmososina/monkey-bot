@@ -365,6 +365,20 @@
         spawnFloatingText(e); // Запускаємо нашу нову анімацію і передаємо їй координати (літеру "e")
     });
 
+    // Секретна кнопка розробника для тестів
+    document.getElementById('beneny').addEventListener('click', () => {
+        beneny += 1000000;
+        updateUI();
+        saveState();
+        // Додамо спливаюче повідомлення, щоб ти бачив, що код спрацював
+        const el = document.createElement('div');
+        el.classList.add('floating-text');
+        el.textContent = "💰 +1 000 000";
+        el.style.left = "50%";
+        el.style.top = "10%";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1000);
+    });
     function buyTrump() {
         const price = 10 + ryja_mavpy * 10;
         if (beneny >= price) {
