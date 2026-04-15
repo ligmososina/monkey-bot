@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🐵 Макакє</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #1a0a2e;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100vh;
+            padding: 24px 16px 32px;
+        }
+
+        .stats {
+            background: rgba(255,255,255,0.07);
+            border-radius: 20px;
+            padding: 16px 28px;
+            text-align: center;
+            width: 100%;
+        }
+
+        #beneny {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffe066;
+        }
+
+        #dohid {
+            font-size: 16px;
+            color: #a0e0a0;
+            margin-top: 6px;
+        }
+
+        .monkey-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #tap-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 110px;
+            line-height: 1;
+            filter: drop-shadow(0 0 18px #ffb30088);
+            transition: transform 0.08s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        #tap-btn:active {
+            transform: scale(0.88);
+        }
+
+        .tap-hint {
+            font-size: 13px;
+            color: #ffffff66;
+            margin-top: 8px;
+        }
+
+        .btn-shop {
+            background: linear-gradient(135deg, #ff8c00, #ffb300);
+            border: none;
+            border-radius: 18px;
+            color: #1a0a2e;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 14px 40px;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.15s;
+        }
+
+        .btn-shop:active { opacity: 0.8; }
+
+        #shop-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            padding: 0px 16px 32px;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .shop-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .shop-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .btn-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        .shop-balance {
+            background: rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #ffe066;
+            font-weight: 600;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .sticky-top {
+            position: sticky;
+            top: 0; /* Прилипає до самого верху */
+            background: #1a0a2e; /* Суцільний колір фону гри, щоб картки не просвічувались */
+            z-index: 100; /* Робить шапку "вищою" за картки (як шари в фотошопі) */
+            padding-top: 24px;
+            padding-bottom: 20px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .item-card {
+            background: rgba(255,255,255,0.07);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .item-icon { font-size: 52px; }
+        .item-info { flex: 1; }
+        .item-name { font-size: 18px; font-weight: 700; }
+        .item-desc { font-size: 13px; color: #ccc; margin-top: 4px; }
+
+        #trump-price, #narko-price, #gattouz-price {
+            font-size: 13px;
+            color: #ffe066;
+            margin-top: 4px;
+        }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #00c853, #69f0ae);
+            border: none;
+            border-radius: 14px;
+            color: #1a0a2e;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .btn-buy:active { opacity: 0.75; }
+
+        #msg-shop {
+            font-size: 15px;
+            min-height: 22px;
+            text-align: center;
+        }
+
+        .owned-badge {
+            font-size: 13px;
+            color: #a0e0a0;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="screen">
+    <div class="stats">
+        <div id="beneny">🍌 0.0 бененів</div>
+        <div id="dohid">📈 0.0 бенен/сек</div>
+    </div>
+
+    <div class="monkey-wrap" style="flex-direction:column; gap:8px">
+        <button id="tap-btn">🐵</button>
+        <div class="tap-hint">тицяй на мавпу!</div>
+    </div>
+
+    <button class="btn-shop" onclick="openShop()">🛒 Магазин</button>
+</div>
+
+<div id="shop-screen">
+    
+    <div class="sticky-top">
+        <div class="shop-header">
+            <span class="shop-title">🛒 Магазин</span>
+            <button class="btn-close" onclick="closeShop()">✖ Назад</button>
+        </div>
+
+        <div class="shop-balance" id="shop-balance">🍌 0.0 бененів</div>
+    </div>
+
+    <div class="item-card">
+        <div class="item-icon">🦧</div>
+        <div class="item-info">
+            <div class="item-name">Рижа Мавпа</div>
+            <div class="item-desc">Дає +0.1 бенен/сек пасивно</div>
+            <div id="trump-price">Ціна: 10 бененів</div>
+            <div class="owned-badge" id="owned-count">У тебе: 0 шт.</div>
+        </div>
+        <button class="btn-buy" onclick="buyTrump()">Купити</button>
+    </div>
+    
+    <div class="item-card">
+            <div class="item-icon">🦍</div>
+            <div class="item-info">
+                <div class="item-name">Нарік Мавп</div>
+                <div class="item-desc">Дає +0.5 бенен/сек пасивно</div>
+                <div id="narko-price">Ціна: 50 бененів</div>
+                <div class="owned-badge" id="narko-owned">У тебе: 0 шт.</div>
+        </div> <button class="btn-buy" onclick="buyNarko()">Купити</button>
+    </div>
+
+    <div class="item-card">
+            <div class="item-icon">🦁</div>
+            <div class="item-info">
+                <div class="item-name">Gattouz</div>
+                <div class="item-desc">Дає +10 бенен/сек пасивно</div>
+                <div id="gattouz-price">Ціна: 5242 бенена</div>
+                <div class="owned-badge" id="gattouz-owned">У тебе: 0 шт.</div>
+        </div> <button class="btn-buy" onclick="buyGattouz()">Купити</button>
+    </div>
+
+    <div id="msg-shop"></div>
+</div>
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    let beneny = 0;
+    let ryja_mavpy = 0;
+    let narkotyczna_mavpy = 0;
+    let gattouz_bradar = 0;
+    let mavpa_tap = 1; 
+    let lastUpdate = Date.now();
+
+    try {
+        const localState = localStorage.getItem('gameState');
+        if (localState) {
+            const state = JSON.parse(localState);
+            beneny = state.beneny || 0;
+            ryja_mavpy = state.ryja_mavpy || 0;
+            narkotyczna_mavpy = state.narkotyczna_mavpy || 0;
+            gattouz_bradar = state.gattouz_bradar || 0;
+            mavpa_tap = state.mavpa_tap || 1;
+        }
+    } catch(e) {}
+    updateUI();
+
+    try {
+        tg.CloudStorage.getItem("gameState", function(err, value) {
+            if (!err && value) {
+                try {
+                    const state = JSON.parse(value);
+                    if (state.beneny > beneny) {
+                        beneny = state.beneny;
+                        ryja_mavpy = state.ryja_mavpy || 0;
+                        narkotyczna_mavpy = state.narkotyczna_mavpy || 0;
+                        gattouz_bradar = state.gattouz_bradar || 0;
+                        mavpa_tap = state.mavpa_tap || 1;
+                        updateUI();
+                    }
+                } catch(e) {}
+            }
+            lastUpdate = Date.now();
+        });
+    } catch(e) {}
+
+    let saveTimeout;
+    function saveState() {
+        const stateStr = JSON.stringify({ beneny: beneny, ryja_mavpy: ryja_mavpy, narkotyczna_mavpy: narkotyczna_mavpy, gattouz_bradar: gattouz_bradar, mavpa_tap: mavpa_tap });
+        try { localStorage.setItem('gameState', stateStr); } catch(e) {}
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+            try { tg.CloudStorage.setItem("gameState", stateStr); } catch(e) {}
+        }, 1000);
+    }
+
+    document.getElementById('tap-btn').addEventListener('click', () => {
+        beneny +=  mavpa_tap;;
+        updateUI();
+        saveState();
+    });
+
+    function buyTrump() {
+        const price = 10 + ryja_mavpy * 10;
+        if (beneny >= price) {
+            beneny -= price;
+            ryja_mavpy += 1;
+            showMsg('✅ Куплено!');
+            saveState();
+        } else {
+            showMsg(`❌ Треба ${price} бененів!`);
+        }
+        updateUI();
+    }
+    function buyNarko() {
+        const price = 50 + narkotyczna_mavpy * 50;
+        if (beneny >= price) {
+            beneny -= price;
+            narkotyczna_mavpy += 1;
+            showMsg('✅ Куплено!');
+            saveState();
+        } else {
+            showMsg(`❌ Треба ${price} бененів!`);
+        }
+        updateUI();
+    }
+     function buyGattouz() {
+        const price = 5242 + gattouz_bradar * 5242;
+        if (beneny >= price) {
+            beneny -= price;
+            gattouz_bradar += 1;
+            showMsg('✅ Куплено!');
+            saveState();
+        } else {
+            showMsg(`❌ Треба ${price} бененів!`);
+        }
+        updateUI();
+    }
+
+    function showMsg(text) {
+        const el = document.getElementById('msg-shop');
+        el.textContent = text;
+        setTimeout(() => el.textContent = '', 2000);
+    }
+
+    function openShop() {
+        document.getElementById('screen').style.display = 'none';
+        document.getElementById('shop-screen').style.display = 'flex';
+        updateUI();
+    }
+
+    function closeShop() {
+        document.getElementById('shop-screen').style.display = 'none';
+        document.getElementById('screen').style.display = 'flex';
+    }
+
+    function updateUI() {
+        const b = Math.floor(beneny * 10) / 10;
+        document.getElementById('beneny').textContent = `🍌 ${b.toFixed(1)} бененів`;
+        document.getElementById('dohid').textContent = `📈 ${(ryja_mavpy * 0.1 + narkotyczna_mavpy * 0.5 + gattouz_bradar * 10).toFixed(1)} бенен/сек`;
+        const price = 10 + ryja_mavpy * 10;
+        const narkoPrice = 50 + narkotyczna_mavpy * 50;
+        const gattouzPrice = 5242 + gattouz_bradar * 5242;
+
+        document.getElementById('trump-price').textContent = `Ціна: ${price} бененів`;
+        document.getElementById('narko-price').textContent = `Ціна: ${narkoPrice} бененів`;
+        document.getElementById('gattouz-price').textContent = `Ціна: ${gattouzPrice} бененів`;
+        document.getElementById('shop-balance').textContent = `🍌 ${b.toFixed(1)} бененів`;
+        document.getElementById('owned-count').textContent = `У тебе: ${ryja_mavpy} шт.`;
+        document.getElementById('narko-owned').textContent = `У тебе: ${narkotyczna_mavpy} шт.`;
+        document.getElementById('gattouz-owned').textContent = `У тебе: ${gattouz_bradar} шт.`;
+    }
+
+    setInterval(() => {
+        const now = Date.now();
+        const elapsed = (now - lastUpdate) / 1000;
+        
+        beneny += (ryja_mavpy * 0.1 + narkotyczna_mavpy * 0.5 + gattouz_bradar * 10) * elapsed;
+
+        if (Math.floor(now / 5000) > Math.floor(lastUpdate / 5000)) {
+            saveState();
+        }
+        
+        lastUpdate = now;
+        updateUI();
+    }, 100);
+</script>
+</body>
+</html>
